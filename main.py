@@ -1,7 +1,7 @@
 """Download stock data from the Internet, format it, and make a CSV."""
 from base64 import b64decode as decode
 import requests
-__version__ = 'v1.0.0-alpha'
+__version__ = '1.0.0-alpha'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -24,7 +24,7 @@ def replace_with_latest():
     response = api('contents/main.py')
     encoded = response.json()['content']
     decoded = str(decode(encoded), 'utf-8')
-    with open(__file__, 'w') as file:
+    with open('main.py', 'w') as file:
         file.write(decoded)
 
 
@@ -229,7 +229,8 @@ def mass_lookup(d, k):
 #            \_      \_      \_      \_  \_    \_        \_
 #     \_\_\_\_\_      \_      \_      \_  \_      \_      \_
 
-print('Stock data downloader version {0}'.format(__version__))
+version = '1.1.0'
+print('Stock data downloader version {0}'.format(version))
 isdev = socket.gethostname() == 'raphael'
 if isdev:
     print('Developer mode active')
