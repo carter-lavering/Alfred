@@ -1,7 +1,7 @@
 """Download stock data from the Internet, format it, and make a CSV."""
 from base64 import b64decode as decode
 import requests
-__version__ = 'v1.0.0-alpha'
+__version__ = '1.0.1-alpha'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -145,7 +145,7 @@ def read_sheet_column(workbook_path, sheet_name=None, headers=True, select=False
         else:
             adjacent_cell = ws.cell(row=y, column=x-1)
             print(read_cell.value, adjacent_cell.value)
-            
+
             if select:
                 print('select')
                 if '#' in str(adjacent_cell.value):
