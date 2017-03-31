@@ -30,16 +30,18 @@ def replace_with_latest():
 
 def self_update():
     """Update only if outdated."""
+    print('Checking for updates...', end=' ', flush=True)
     if is_outdated():
+        print('Update found')
+        print('Updating...', end=' ')
         replace_with_latest()
-
-
-def main():
-    self_update()
+        print('Done')
+    else:
+        print('No update found')
 
 
 if __name__ == '__main__':
-    main()
+    self_update()
 
 #!/usr/bin/env python
 # coding=utf-8
@@ -137,26 +139,20 @@ def read_sheet_column(workbook_path, sheet_name=None, headers=True, select=False
     else:
         y = corner[1]
     read_cell = ws.cell(row=y, column=x)
-    print(read_cell)
     while read_cell.value:
         read_cell = ws.cell(row=y, column=x)
         if x == 1:
             output_cells.append(read_cell.value)
         else:
             adjacent_cell = ws.cell(row=y, column=x-1)
-            print(read_cell.value, adjacent_cell.value)
 
             if select:
-                print('select')
                 if '#' in str(adjacent_cell.value):
                     try:
-                        print('yay')
                         output_cells.append(read_cell.value.upper())
                     except AttributeError:
-                        print('whoops')
                         output_cells.append(read_cell.value)
             else:
-                print('not select')
                 if '#' not in str(adjacent_cell.value):
                     try:
                         output_cells.append(read_cell.value.upper())
@@ -166,16 +162,28 @@ def read_sheet_column(workbook_path, sheet_name=None, headers=True, select=False
     return [cell for cell in output_cells if cell is not None]
 
 
+def strip_matrix(matrix):
+    """Ensure matrix is shifted as far left as possible."""
+    while not any([row[0] for row in matrix]):
+        matrix = [row[1:] for row in matrix]
+
+
+def read_sheet(workbook_path, sheet_name=None, headers=True):
+    """Return 2D list of cell values from uncommented rows."""
+    workbook = openpyxl.load_workbook(workbook_path)
+    if sheet_name is not None:
+        sheet = workbook[sheet_name]
+    else:
+        sheet = workbook.active
+    uncommented_rows = [[cell.value for cell in row] for row in sheet.rows if row[0].value != '#']
+    return uncommented_rows
+
+
 def week(timestamp):
-    """Returns the ISO calendar week number of a given timestamp.
+    """Return the ISO calendar week number of a given timestamp.
 
     Timestamp can be either an integer or a string."""
     return datetime.utcfromtimestamp(int(timestamp)).isocalendar()[1]
-
-
-def notify(message):
-    """Gives a Pushbullet message."""
-    ifttt('notify', v1=message)
 
 
 def end_script(terminate=True):
@@ -185,24 +193,6 @@ def end_script(terminate=True):
         sys.exit()
     elif terminate:
         sys.exit()
-
-
-def error(msg):
-    print(msg)
-    notify(msg)
-    end_script()
-
-
-def excel_close(file):
-    try:
-        file.close()
-        return True
-    except PermissionError:
-        return False
-        input('Permissions denied! Please close all Excel windows and try'
-              ' again.')
-        if excel_close(file):
-            pass
 
 
 def rearrange(lst, order):
@@ -240,7 +230,19 @@ desktop = expanduser('~') + '\\Desktop\\'
 
 print('Opening files...')
 try:
-    signs = read_sheet_column(desktop + 'stock_signs.xlsx')
+    symbols_sheet = read_sheet(desktop + 'stock_signs.xlsx')
+    signs = [row[1] for row in symbols_sheet]
+    assert len(symbols_sheet) == len(signs)
+    additional_data = {}
+    for row in symbols_sheet:
+        additional_data[row[1]] = dict()
+        additional_data[row[1]]['Ex dividend date'] = row[4+1]
+        additional_data[row[1]]['Quarterly dividend'] = row[5+1]
+        additional_data[row[1]]['Capitalization'] = row[6+1]
+        additional_data[row[1]]['Rating'] = row[7+1]
+        additional_data[row[1]]['Next earnings date'] = row[8+1]
+    for symbol in additional_data:
+        print(additional_data[symbol])
 except FileNotFoundError:
     write_signs = openpyxl.Workbook()
     write_signs.save(desktop + 'stock_signs.xlsx')
@@ -249,8 +251,8 @@ except FileNotFoundError:
           ' ones you don\'t want.')
     end_script(terminate=False)
 try:
-    dates = read_sheet_column(desktop + 'stock_dates.xlsx', select=True)
-    dates = [date for date in dates if type(date) is not str]
+    dates_sheet = read_sheet(desktop + 'stock_dates.xlsx')
+    dates = [row[1] for row in dates_sheet]
     print(dates)
     dates_weeks = [date.isocalendar()[:1] for date in dates]
     # print(dates_weeks)
@@ -508,7 +510,7 @@ print('{0} signs, {1} dates'.format(len(signs), len(dates)))
 dt = datetime.fromtimestamp(time.time())
 date = dt.strftime('%d-%m-%Y')
 
-print(date)
+print('Date:', date)
 
 if not isdev:
     output_path = (
@@ -654,6 +656,7 @@ headers = [
     'Company',
     'Industry',
     'Sector',
+    'Ex dividend date', 'Quarterly dividend', 'Capitalization', 'Rating', 'Next earnings date',
     'Price',
     'Expiration',
     'Strike',
@@ -687,6 +690,10 @@ for d in all_data_by_header:
 
     d['Expiration'] = (
         datetime.utcfromtimestamp(d['Expiration']).strftime('%m/%d/%Y'))
+
+    d.update(additional_data[d['Stock']])
+    print('d', d)
+    print('a', additional_data[d['Stock']])
 
 # Original formulas
 # formulas = [
@@ -722,7 +729,7 @@ h_offset = 4
 
 formatted_data_table = [headers] + [
     mass_lookup(row, [
-        'Stock', 'Company', 'Industry', 'Sector', 'Stock Last', 'Expiration',
+        'Stock', 'Company', 'Industry', 'Sector', 'Ex dividend date', 'Quarterly dividend', 'Capitalization', 'Rating', 'Next earnings date', 'Stock Last', 'Expiration',
         'Strike', 'Bid', 'Ask', 'Volume', 'Last Price']) +
     # +2 because Excel starts counting at 1 and because there are headers
     [f.format(n=i+v_offset+2) for f in formulas]
