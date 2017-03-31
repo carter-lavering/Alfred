@@ -1,7 +1,7 @@
 """Download stock data from the Internet, format it, and make a CSV."""
 from base64 import b64decode as decode
 import requests
-__version__ = '1.0.1-alpha'
+__version__ = '1.0.2'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
