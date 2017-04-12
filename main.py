@@ -11,7 +11,7 @@ from os.path import expanduser
 import openpyxl
 import requests
 
-__version__ = '1.1'
+__version__ = '1.1.1'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -215,8 +215,8 @@ try:
         additional_data[row[0]]['Ex dividend date'] = row[4]
         additional_data[row[0]]['Quarterly dividend'] = row[5]
         additional_data[row[0]]['Capitalization'] = row[6]
-        additional_data[row[0]]['Rating'] = row[7]
-        additional_data[row[0]]['Next earnings date'] = row[8]
+        additional_data[row[0]]['Next earnings date'] = row[7]
+        additional_data[row[0]]['Rating'] = row[8]
 except FileNotFoundError:
     write_signs = openpyxl.Workbook()
     write_signs.save(desktop + 'stock_signs.xlsx')
