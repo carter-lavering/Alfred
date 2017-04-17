@@ -11,7 +11,7 @@ from os.path import expanduser
 import openpyxl
 import requests
 
-__version__ = '1.1.1'
+__version__ = '1.1.2'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -435,12 +435,26 @@ for d in all_data_by_header:
 #     '=IF((ABS(H{n}-F{n})/H{n})<W$6,"NTM","")'
 # ]
 
+# formulas = [
+#     '=IF(K{n}<I{n},(K{n}-I{n})+O{n},O{n})', '=J{n}-P$6',
+#     '=ROUND(R$6/((I{n}-0)*100),0)', '=100*R{n}*(I{n}-0)', '=100*P{n}*R{n}',
+#     '=T{n}/S{n}', '=(365/Q{n})*U{n}',
+#     '=IF(K{n}>I{n},(100*R{n}*(K{n}-I{n}))+T{n},T{n})', '=W{n}/S{n}',
+#     '=(365/Q{n})*X{n}', '=IF((ABS(K{n}-I{n})/K{n})<Z$6,"NTM","")'
+# ]
+
 formulas = [
-    '=IF(K{n}<I{n},(K{n}-I{n})+O{n},O{n})', '=J{n}-P$6',
-    '=ROUND(R$6/((I{n}-0)*100),0)', '=100*R{n}*(I{n}-0)', '=100*P{n}*R{n}',
-    '=T{n}/S{n}', '=(365/Q{n})*U{n}',
-    '=IF(K{n}>I{n},(100*R{n}*(K{n}-I{n}))+T{n},T{n})', '=W{n}/S{n}',
-    '=(365/Q{n})*X{n}', '=IF((ABS(K{n}-I{n})/K{n})<Z$6,"NTM","")'
+    '=IF(P{n}<N{n},(P{n}-N{n})+T{n},T{n})',
+    '=O4-U$6',
+    '=ROUND(W$6/((N{n}-0)*100),0',
+    '=100*W{n}*(N{n}-0)',
+    '=100*U{n}*W{n}',
+    '=Y{n}/X{n}',
+    '=(365/V{n})*Z{n}',
+    '=IF(P{n}>N{n},(100*W{n}*(P{n}-N{n}))+Y{n},Y{n})',
+    '=AB{n}/X{n}',
+    '=(365/V{n})*AC{n}',
+    '=IF((ABS(P{n}-N{n}/P{n})<AE$6,"NTM","")',
 ]
 
 v_offset = 5
