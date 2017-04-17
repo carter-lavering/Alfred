@@ -446,7 +446,7 @@ for d in all_data_by_header:
 formulas = [
     '=IF(P{n}<N{n},(P{n}-N{n})+T{n},T{n})',
     '=O4-U$6',
-    '=ROUND(W$6/((N{n}-0)*100),0',
+    '=ROUND(W$6/((N{n}-0)*100),0)',
     '=100*W{n}*(N{n}-0)',
     '=100*U{n}*W{n}',
     '=Y{n}/X{n}',
@@ -454,7 +454,7 @@ formulas = [
     '=IF(P{n}>N{n},(100*W{n}*(P{n}-N{n}))+Y{n},Y{n})',
     '=AB{n}/X{n}',
     '=(365/V{n})*AC{n}',
-    '=IF((ABS(P{n}-N{n}/P{n})<AE$6,"NTM","")',
+    '=IF(ABS(P{n}-N{n}/P{n})<AE$6,"NTM","")',
 ]
 
 v_offset = 5
