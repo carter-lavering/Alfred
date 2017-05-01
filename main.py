@@ -11,7 +11,7 @@ from os.path import expanduser
 import openpyxl
 import requests
 
-__version__ = '1.1.2'
+__version__ = '1.1.3'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -44,7 +44,7 @@ def self_update():
     if latest_version > __version__:
         print('Update found')
         print(
-            'Updating to {new} (current {old})...'.format(
+            'Updating to {new} from {old}...'.format(
                 new=latest_version, old=__version__),
             end=' ',
             flush=True)
@@ -220,7 +220,7 @@ try:
 except FileNotFoundError:
     write_signs = openpyxl.Workbook()
     write_signs.save(desktop + 'stock_signs.xlsx')
-    print('Please go to your desktop and put the dates you want into'
+    print('Please go to your desktop and put the symbols you want into'
           ' stock_signs.xlsx. Put hash marks in the cells to the left of the'
           ' ones you don\'t want.')
     end_script(terminate=False)
@@ -231,7 +231,7 @@ try:
 except FileNotFoundError:
     write_dates = openpyxl.Workbook()
     write_dates.save(desktop + 'stock_dates.xlsx')
-    print('Please go to your desktop and put the signs you want into'
+    print('Please go to your desktop and put the dates you want into'
           ' stock_dates.xlsx. Put hash marks in the cells to the left of the'
           " ones you don't want.")
     end_script(terminate=False)
@@ -288,7 +288,7 @@ errors = []
 
 first_iter = True
 for sign in signs:
-    # all_data[sign] = {}
+    # Print "SYMBOL (2 of 4)"
     print(
         '{n}{0:{1}} ({2:{3}} of {4})'.format(
             sign,
@@ -420,41 +420,12 @@ for d in all_data_by_header:
 
     d.update(additional_data[d['Stock']])
 
-# Original formulas
-# formulas = [
-#     '=IF(H{n}<F{n},(H{n}-F{n})+I{n},I{n})',
-#     '=G{n}-M$6',
-#     '=ROUND(O$6/((F{n}-0)*100),0)',
-#     '=100*O{n}*(F{n}-0)',
-#     '=100*M{n}*O{n}',
-#     '=(Q{n}/P{n})*100',
-#     '=(365/N{n})*R{n}',
-#     '=100*M{n}*O{n}',
-#     '=(T{n}/P{n})*100',
-#     '=((365/N{n})*U{n})*100',
-#     '=IF((ABS(H{n}-F{n})/H{n})<W$6,"NTM","")'
-# ]
-
-# formulas = [
-#     '=IF(K{n}<I{n},(K{n}-I{n})+O{n},O{n})', '=J{n}-P$6',
-#     '=ROUND(R$6/((I{n}-0)*100),0)', '=100*R{n}*(I{n}-0)', '=100*P{n}*R{n}',
-#     '=T{n}/S{n}', '=(365/Q{n})*U{n}',
-#     '=IF(K{n}>I{n},(100*R{n}*(K{n}-I{n}))+T{n},T{n})', '=W{n}/S{n}',
-#     '=(365/Q{n})*X{n}', '=IF((ABS(K{n}-I{n})/K{n})<Z$6,"NTM","")'
-# ]
-
 formulas = [
-    '=IF(P{n}<N{n},(P{n}-N{n})+T{n},T{n})',
-    '=O4-U$6',
-    '=ROUND(W$6/((N{n}-0)*100),0)',
-    '=100*W{n}*(N{n}-0)',
-    '=100*U{n}*W{n}',
-    '=Y{n}/X{n}',
-    '=(365/V{n})*Z{n}',
-    '=IF(P{n}>N{n},(100*W{n}*(P{n}-N{n}))+Y{n},Y{n})',
-    '=AB{n}/X{n}',
-    '=(365/V{n})*AC{n}',
-    '=IF(ABS(P{n}-N{n}/P{n})<AE$6,"NTM","")',
+    '=IF(P{n}<N{n},(P{n}-N{n})+T{n},T{n})', '=O{n}-U$6',
+    '=ROUND(W$6/((N{n}-0)*100),0)', '=100*W{n}*(N{n}-0)', '=100*U{n}*W{n}',
+    '=Y{n}/X{n}', '=(365/V{n})*Z{n}',
+    '=IF(P{n}>N{n},(100*W{n}*(P{n}-N{n}))+Y{n},Y{n})', '=AB{n}/X{n}',
+    '=(365/V{n})*AC{n}', '=IF(ABS(P{n}-N{n}/P{n})<AE$6,"NTM","")'
 ]
 
 v_offset = 5
@@ -496,5 +467,13 @@ except PermissionError:
         csv_writer = csv.writer(csv_file)
         for row in formatted_data_table:
             csv_writer.writerow(row)
+except FileNotFoundError:
+    try:
+        with open(f'options_report_{date}.csv', 'w', newline='') as csv_file:
+            csv_writer = csv.writer(csv_file)
+            for row in formatted_data_table:
+                csv_writer.writerow(row)
+    except PermissionError:
+        pass
 
 print('Done')
