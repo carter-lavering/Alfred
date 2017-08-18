@@ -11,7 +11,11 @@ from os.path import expanduser
 import openpyxl
 import requests
 
+<<<<<<< HEAD
 __version__ = '1.1.5'
+=======
+__version__ = '1.1.6'
+>>>>>>> origin/master
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -518,6 +522,10 @@ if __name__ == '__main__':
         print()
         print(repr(e))
         print()
+<<<<<<< HEAD
         input(
             'Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit'
         )
+=======
+        input('Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit')
+>>>>>>> origin/master
