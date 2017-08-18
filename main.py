@@ -1,11 +1,9 @@
 """Download stock data from the Internet, format it, and make a CSV."""
 import csv
 import json
-from pyperclip import copy
 import socket
 import sys
 import time
-from tkinter import Tk
 from base64 import b64decode
 from datetime import datetime
 from os.path import expanduser
@@ -13,7 +11,7 @@ from os.path import expanduser
 import openpyxl
 import requests
 
-__version__ = '1.1.4'
+__version__ = '1.1.5'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
@@ -283,22 +281,23 @@ def main():
     #           \_\_\_\_\_    \_\_\_    \_      \_  \_\_\_\_
 
     options_data_url = 'https://query1.finance.yahoo.com/v7/finance/options/{0}'
-    stock_data_url = ('https://query1.finance.yahoo.com/v10/finance/quoteSummary/'
-                      '{0}?modules=assetProfile')
+    stock_data_url = (
+        'https://query1.finance.yahoo.com/v10/finance/quoteSummary/'
+        '{0}?modules=assetProfile')
 
     # Headers
     all_data = [[
         'Stock', 'Timestamp', 'Contract Symbol', 'Strike', 'Currency',
         'Last Price', 'Change', '% Change', 'Volume', 'Open Interest', 'Bid',
         'Ask', 'Contract Size', 'Expiration', 'Last Trade Date',
-        'Implied Volatility', 'In The Money', 'Stock Last', 'Industry', 'Sector',
-        'Company'
+        'Implied Volatility', 'In The Money', 'Stock Last', 'Industry',
+        'Sector', 'Company'
     ]]
     json_headers = [
         'contractSymbol', 'strike', 'currency', 'lastPrice', 'change',
-        'percentChange', 'volume', 'openInterest', 'bid', 'ask', 'contractSize',
-        'expiration', 'lastTradeDate', 'impliedVolatility', 'inTheMoney',
-        'quoteLast', 'industry', 'sector', 'company'
+        'percentChange', 'volume', 'openInterest', 'bid', 'ask',
+        'contractSize', 'expiration', 'lastTradeDate', 'impliedVolatility',
+        'inTheMoney', 'quoteLast', 'industry', 'sector', 'company'
     ]
     errors = []
 
@@ -329,7 +328,13 @@ def main():
             ts for ts in timestamps_from_site
             if datetime.fromtimestamp(ts).isocalendar()[:1] in dates_weeks
         ]
-        print(' [', '-' * len(timestamps_to_use), ']', sep='', end='', flush=True)
+        print(
+            ' [',
+            '-' * len(timestamps_to_use),
+            ']',
+            sep='',
+            end='',
+            flush=True)
 
         weekdays = []
 
@@ -393,9 +398,11 @@ def main():
                 except KeyError:
                     # TODO: More verbose
                     complete_success = False
-                    messages.append('Something went wrong with {d} ({ts})'.format(
-                        d=datetime.utcfromtimestamp(ts).strftime('%m/%d/%Y'),
-                        ts=ts))
+                    messages.append(
+                        'Something went wrong with {d} ({ts})'.format(
+                            d=datetime.utcfromtimestamp(ts).strftime(
+                                '%m/%d/%Y'),
+                            ts=ts))
                     print('-', end='', flush=True)
                     continue
             if complete_success:
@@ -416,8 +423,9 @@ def main():
         'Symbol', 'Company', 'Industry', 'Sector', 'Ex dividend date',
         'Quarterly dividend', 'Capitalization', 'Rating', 'Next earnings date',
         'Price', 'Expiration', 'Strike', 'Bid', 'Ask', 'Volume', 'Last Call',
-        datetime.now().date(), 'days', '70,000', ' $invested', '$prem', 'prem%',
-        'annPrem%', 'MaxRet', 'Max%', 'annMax%', '10%'
+        datetime.now().date(), 'days', '70,000', ' $invested', '$prem',
+        'prem%', 'annPrem%', 'MaxRet', 'Max%', 'annMax%', '10%',
+        'Quarterly dividends'
     ]
 
     all_data_by_header = [{h: x[i]
@@ -425,11 +433,11 @@ def main():
                           for x in all_data[1:]]
 
     for d in all_data_by_header:
-        d['Timestamp'] = (
-            datetime.utcfromtimestamp(d['Timestamp']).strftime('%m/%d/%Y %H:%M'))
+        d['Timestamp'] = (datetime.utcfromtimestamp(
+            d['Timestamp']).strftime('%m/%d/%Y %H:%M'))
 
-        d['Last Trade Date'] = (
-            datetime.utcfromtimestamp(d['Last Trade Date']).strftime('%m/%d/%Y'))
+        d['Last Trade Date'] = (datetime.utcfromtimestamp(
+            d['Last Trade Date']).strftime('%m/%d/%Y'))
 
         d['Expiration'] = (
             datetime.utcfromtimestamp(d['Expiration']).strftime('%m/%d/%Y'))
@@ -441,7 +449,8 @@ def main():
         '=ROUND(W$6/((N{n}-0)*100),0)', '=100*W{n}*(N{n}-0)', '=100*U{n}*W{n}',
         '=Y{n}/X{n}', '=(365/V{n})*Z{n}',
         '=IF(P{n}>N{n},(100*W{n}*(P{n}-N{n}))+Y{n},Y{n})', '=AB{n}/X{n}',
-        '=(365/V{n})*AC{n}', '=IF((ABS(P{n}-N{n})/P{n})<AE$6,"NTM","")'
+        '=(365/V{n})*AC{n}', '=IF((ABS(P{n}-N{n})/P{n})<AE$6,"NTM","")',
+        '=TRUNC(DAYS(O{n},I{n})/90,0)+1'
     ]
 
     v_offset = 5
@@ -450,17 +459,20 @@ def main():
     keys = [
         'Stock', 'Company', 'Industry', 'Sector', 'Ex dividend date',
         'Quarterly dividend', 'Capitalization', 'Rating', 'Next earnings date',
-        'Stock Last', 'Expiration', 'Strike', 'Bid', 'Ask', 'Volume', 'Last Price'
+        'Stock Last', 'Expiration', 'Strike', 'Bid', 'Ask', 'Volume',
+        'Last Price'
     ]
     # +2 because Excel starts counting at 1 and because there are headers
     formatted_data_table = ([headers] + [
-        mass_lookup(row, keys) + [f.format(n=i + v_offset + 2) for f in formulas]
+        mass_lookup(row, keys) +
+        [f.format(n=i + v_offset + 2) for f in formulas]
         for i, row in enumerate(all_data_by_header)
     ])
 
     # Offset for formulas to work
-    formatted_data_table = ([[]] * v_offset + [[''] * h_offset + row
-                                               for row in formatted_data_table])
+    formatted_data_table = (
+        [[]] * v_offset + [[''] * h_offset + row
+                           for row in formatted_data_table])
 
     # # \_      \_  \_\_\_\_    \_\_\_\_\_  \_\_\_\_\_  \_\_\_\_\_
     # #  \_      \_  \_      \_      \_          \_      \_
@@ -485,7 +497,9 @@ def main():
                 csv_writer.writerow(row)
     except FileNotFoundError:
         try:
-            with open('options_report_{date}.csv'.format(date=date), 'w', newline='') as csv_file:
+            with open(
+                    'options_report_{date}.csv'.format(date=date), 'w',
+                    newline='') as csv_file:
                 csv_writer = csv.writer(csv_file)
                 for row in formatted_data_table:
                     csv_writer.writerow(row)
@@ -504,4 +518,6 @@ if __name__ == '__main__':
         print()
         print(repr(e))
         print()
-        input('Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit')
+        input(
+            'Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit'
+        )
