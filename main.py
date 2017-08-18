@@ -425,7 +425,7 @@ def main():
         'Price', 'Expiration', 'Strike', 'Bid', 'Ask', 'Volume', 'Last Call',
         datetime.now().date(), 'days', '70,000', ' $invested', '$prem',
         'prem%', 'annPrem%', 'MaxRet', 'Max%', 'annMax%', '10%',
-        'Quarterly dividends'
+        'Quarterly dividends', 'Total dividends'
     ]
 
     all_data_by_header = [{h: x[i]
@@ -450,7 +450,7 @@ def main():
         '=Y{n}/X{n}', '=(365/V{n})*Z{n}',
         '=IF(P{n}>N{n},(100*W{n}*(P{n}-N{n}))+Y{n},Y{n})', '=AB{n}/X{n}',
         '=(365/V{n})*AC{n}', '=IF((ABS(P{n}-N{n})/P{n})<AE$6,"NTM","")',
-        '=TRUNC(DAYS(O{n},I{n})/90,0)+1'
+        '=TRUNC(DAYS(O{n},I{n})/90,0)+1', '=AF{n}*J{n}'
     ]
 
     v_offset = 5
