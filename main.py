@@ -40,19 +40,21 @@ def replace_with_latest():
 def self_update():
     """Update only if outdated."""
     print('Checking for updates...', end=' ', flush=True)
-    latest_version = get_latest_release()
-    if latest_version > __version__:
-        print('Update found')
-        print(
-            'Updating to {new} from {old}...'.format(
-                new=latest_version, old=__version__),
-            end=' ',
-            flush=True)
-        replace_with_latest()
-        print('Done')
-    else:
-        print('No update found')
-
+    try:
+        latest_version = get_latest_release()
+        if latest_version > __version__:
+            print('Update found')
+            print(
+                'Updating to {new} from {old}...'.format(
+                    new=latest_version, old=__version__),
+                end=' ',
+                flush=True)
+            replace_with_latest()
+            print('Done')
+        else:
+            print('No update found')
+    except ConnectionError:
+        print('Failed. Continuing with program...')
 
 # \_\_\_\_    \_\_\_\_\_  \_\_\_\_\_  \_\_\_\_\_  \_      \_  \_\_\_\_
 #  \_      \_  \_          \_              \_      \_\_    \_  \_
