@@ -11,7 +11,7 @@ from os.path import expanduser
 import openpyxl
 import requests
 
-__version__ = '1.1.8'
+__version__ = '1.1.9'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
 
