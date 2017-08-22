@@ -518,10 +518,4 @@ if __name__ == '__main__':
         print()
         print(repr(e))
         print()
-<<<<<<< HEAD
-        input(
-            'Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit'
-        )
-=======
         input('Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit')
->>>>>>> origin/master
