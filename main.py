@@ -53,7 +53,7 @@ def self_update():
             print('Done')
         else:
             print('No update found')
-    except ConnectionError:
+    except requests.exceptions.ConnectionError as e:
         print('Failed. Continuing with program...')
 
 # \_\_\_\_    \_\_\_\_\_  \_\_\_\_\_  \_\_\_\_\_  \_      \_  \_\_\_\_
@@ -214,7 +214,6 @@ def mass_lookup(d, k):
 
 
 def main():
-    print('Alfred version {0}'.format(__version__))
     isdev = socket.gethostname() == 'raphael'
 
     desktop = expanduser('~') + '\\Desktop\\'
@@ -512,6 +511,7 @@ def main():
 
 
 if __name__ == '__main__':
+    print('Alfred', __version__)
     try:
         self_update()
         main()
