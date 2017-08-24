@@ -11,9 +11,11 @@ from os.path import expanduser
 import openpyxl
 import requests
 
-__version__ = '1.1.9'
+__version__ = '1.1.10'
 
 REPO = 'http://api.github.com/repos/carter-lavering/Alfred/'
+
+DEVELOPER_MODE = socket.gethostname() == 'raphael'
 
 
 def api(subdir):
@@ -56,6 +58,7 @@ def self_update():
     except requests.exceptions.ConnectionError as e:
         print('Failed. Continuing with program...')
 
+
 # \_\_\_\_    \_\_\_\_\_  \_\_\_\_\_  \_\_\_\_\_  \_      \_  \_\_\_\_
 #  \_      \_  \_          \_              \_      \_\_    \_  \_
 #   \_      \_  \_\_\_\_\_  \_\_\_\_\_      \_      \_  \_  \_  \_\_\_\_
@@ -87,20 +90,6 @@ def get_sheet_corner(workbook_path, sheet_name=None):
                 return (x + 1, y + 1)
                 corner_found = True
         first_x += 1
-
-
-def copy(text):
-    """Copies text to clipboard."""
-    r = Tk()
-    r.withdraw()
-    r.clipboard_clear()
-    r.clipboard_append(repr(text))
-
-    r.update()
-    time.sleep(.2)
-    r.update()
-
-    # r.destroy()
 
 
 def read_sheet_column(workbook_path,
@@ -180,7 +169,7 @@ def week(timestamp):
 
 def end_script(terminate=True):
     """End program."""
-    if not isdev:
+    if not DEVELOPER_MODE:
         input('Press enter to exit')
         sys.exit()
     elif terminate:
@@ -214,8 +203,6 @@ def mass_lookup(d, k):
 
 
 def main():
-    isdev = socket.gethostname() == 'raphael'
-
     desktop = expanduser('~') + '\\Desktop\\'
 
     print('Opening files...')
@@ -258,7 +245,7 @@ def main():
     dt = datetime.fromtimestamp(time.time())
     date = dt.strftime('%d-%m-%Y')
 
-    if not isdev:
+    if not DEVELOPER_MODE:
         output_path = (
             'C:/Users/Gary/Documents/Option_tables/Option_Model_Files/'
             'OptionReportDirectory/options_report_{0}.csv'.format(date))
@@ -281,7 +268,8 @@ def main():
     #          \_          \_      \_  \_      \_  \_      \_
     #           \_\_\_\_\_    \_\_\_    \_      \_  \_\_\_\_
 
-    options_data_url = 'https://query1.finance.yahoo.com/v7/finance/options/{0}'
+    options_data_url = (
+        'https://query1.finance.yahoo.com/v7/finance/options/{0}')
     stock_data_url = (
         'https://query1.finance.yahoo.com/v10/finance/quoteSummary/'
         '{0}?modules=assetProfile')
@@ -300,7 +288,6 @@ def main():
         'contractSize', 'expiration', 'lastTradeDate', 'impliedVolatility',
         'inTheMoney', 'quoteLast', 'industry', 'sector', 'company'
     ]
-    errors = []
 
     first_iter = True
     for sign in signs:
@@ -336,8 +323,6 @@ def main():
             sep='',
             end='',
             flush=True)
-
-        weekdays = []
 
         stock_page = requests.get(stock_data_url.format(sign))
         stock_json = json.loads(stock_page.text)
@@ -520,4 +505,7 @@ if __name__ == '__main__':
         print()
         print(repr(e))
         print()
-        input('Please select the error with your mouse, right-click to copy, and paste with Ctrl-V into an email.\nPress Enter to exit')
+        input(
+            'Please select the error with your mouse, right-click to copy, '
+            'and paste with Ctrl-V into an email.\nPress Enter to exit'
+        )
